@@ -1,0 +1,134 @@
+auto lo
+iface lo inet loopback
+  address {{ loopback.ip }}
+  clagd-vxlan-anycast-ip {{ loopback.clag_anycast }}
+
+# Management interface
+auto eth0
+iface eth0 inet dhcp
+    alias management interface
+    vrf mgmt
+
+auto mgmt
+iface mgmt
+    address 127.0.0.1/8
+    vrf-table auto
+
+# Port to Server01
+auto swp1
+iface swp1
+  alias {{ swp1.description }}
+  # This is required for Vagrant only
+  post-up ip link set swp1 promisc on
+
+# Port to Leaf02
+auto swp49
+iface swp49
+  alias {{ swp49.description }}
+  # This is required for Vagrant only
+  post-up ip link set swp49 promisc on
+
+# Port to Leaf02
+auto swp50
+iface swp50
+  alias {{ swp50.description }}
+  # This is required for Vagrant only
+  post-up ip link set swp50 promisc on
+
+# Port to Spine01
+auto swp51
+iface swp51
+  mtu 9216
+  alias {{ swp51.description }}
+
+# Port to Spine02
+auto swp52
+iface swp52
+  mtu 9216
+  alias {{ swp52.description }}
+
+# CLAG Peerlink bond
+auto peerlink
+iface peerlink
+  mtu 9000
+  bond-slaves swp49 swp50
+
+# CLAG Peerlink L2 interface.
+# This creates VLAN 4094 that only lives on the peerlink bond
+# No other interface will be aware of VLAN 4094
+auto peerlink.4094
+iface peerlink.4094
+  address {{ peerlink.address }}
+  clagd-peer-ip {{ peerlink.peerip }}
+  clagd-backup-ip {{ peerlink.peerbackup }}
+  clagd-sys-mac 44:39:39:ff:40:94
+  clagd-priority {{ peerlink.priority }}
+
+# Bond to Server01
+auto bond01
+iface bond01
+  mtu 9000
+  bond-slaves {{ bond01.slaves }}
+  bridge-access {{ bond01.access_vlan }}
+  clag-id {{ bond01.clag_id }}
+
+# Bond to Server02
+auto bond02
+iface bond02
+  mtu 9000
+  bond-slaves {{ bond02.slaves }}
+  bridge-access {{ bond02.access_vlan }}
+  clag-id {{ bond02.clag_id }}
+
+# Define the bridge for STP
+auto bridge
+iface bridge
+  bridge-vlan-aware yes
+  # bridge-ports includes all ports related to VxLAN and CLAG.
+  # does not include the Peerlink.4094 subinterface
+  bridge-ports {%- for ports in bridge.ports %} {{ ports }}
+  {%- endfor %}
+  
+  bridge-vids {%- for vids in bridge.vlans %} {{ vids }}
+  {%- endfor %}
+  
+  bridge-pvid 1
+
+# VxLAN Tunnel for Server1-Server3 (Vlan 13)
+auto vni13
+iface vni13
+  mtu 9000
+  vxlan-id {{ vni13.vxlan_id }}
+  vxlan-local-tunnelip {{ vni13.local_ip }}
+  bridge-access {{ vni13.vlan_id }}
+  bridge-learning off
+  mstpctl-bpduguard yes
+  mstpctl-portbpdufilter yes
+  bridge-arp-nd-suppress on
+
+
+#VxLAN Tunnel for Server2-Server4 (Vlan 24)
+auto vni24
+iface vni24
+  mtu 9000
+  vxlan-id {{ vni24.vxlan_id }}
+  vxlan-local-tunnelip {{ vni24.local_ip }}
+  bridge-access {{ vni24.vlan_id }}
+  bridge-learning off
+  mstpctl-bpduguard yes
+  mstpctl-portbpdufilter yes
+  bridge-arp-nd-suppress on
+
+auto vlan13
+iface vlan13
+    address {{ vlan13.address }}
+    address-virtual {{ vlan13.vrr.mac }} {{ vlan13.vrr.ip }}
+    vlan-id {{ vlan13.vlan }}
+    vlan-raw-device bridge
+
+auto vlan24
+iface vlan24
+    address {{ vlan24.address }}
+    address-virtual {{ vlan24.vrr.mac }} {{ vlan24.vrr.ip }}
+    vlan-id {{ vlan24.vlan }}
+    vlan-raw-device bridge
