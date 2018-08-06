@@ -3,30 +3,29 @@ iface lo inet loopback
   address {{ loopback.ip }}
   clagd-vxlan-anycast-ip {{ loopback.clag_anycast }}
 
-# Management interface
-auto eth0
-iface eth0 inet dhcp
-    alias management interface
-    vrf mgmt
-
 auto mgmt
 iface mgmt
     address 127.0.0.1/8
     vrf-table auto
 
-# Port to Server01
+auto vagrant
+iface vagrant inet dhcp
+
 auto swp1
 iface swp1
-  alias {{ swp1.description }}
-  # This is required for Vagrant only
-  post-up ip link set swp1 promisc on
+    alias test2
+    address 192.168.5.5/24
+
+auto eth0
+iface eth0 inet dhcp
+
 
 # Port to Leaf02
-auto swp49
-iface swp49
-  alias {{ swp49.description }}
-  # This is required for Vagrant only
-  post-up ip link set swp49 promisc on
+#auto swp49
+#iface swp49
+#  alias {{ swp49.description }}
+#  # This is required for Vagrant only
+#  post-up ip link set swp49 promisc on
 
 # Port to Leaf02
 auto swp50
@@ -51,7 +50,7 @@ iface swp52
 auto peerlink
 iface peerlink
   mtu 9000
-  bond-slaves swp49 swp50
+  bond-slaves swp50
 
 # CLAG Peerlink L2 interface.
 # This creates VLAN 4094 that only lives on the peerlink bond
@@ -63,22 +62,6 @@ iface peerlink.4094
   clagd-backup-ip {{ peerlink.peerbackup }}
   clagd-sys-mac 44:39:39:ff:40:94
   clagd-priority {{ peerlink.priority }}
-
-# Bond to Server01
-auto bond01
-iface bond01
-  mtu 9000
-  bond-slaves {{ bond01.slaves }}
-  bridge-access {{ bond01.access_vlan }}
-  clag-id {{ bond01.clag_id }}
-
-# Bond to Server02
-auto bond02
-iface bond02
-  mtu 9000
-  bond-slaves {{ bond02.slaves }}
-  bridge-access {{ bond02.access_vlan }}
-  clag-id {{ bond02.clag_id }}
 
 # Define the bridge for STP
 auto bridge

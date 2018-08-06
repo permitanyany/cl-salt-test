@@ -13,24 +13,14 @@ leaf1:
  swp51:
   description: to Spine01
  swp52:
-  description: to Spine02
+  description: to Spine02Test
  peerlink:
   address: 169.254.1.1/30
   peerip: 169.254.1.2
   peerbackup: 10.0.0.12
   priority: 100
- bond01:
-  slaves: swp1
-  access_vlan: 13
-  clag_id: 1
- bond02:
-  slaves: swp2
-  access_vlan: 24
-  clag_id: 2
  bridge:
   ports:
-    - bond01
-    - bond02
     - peerlink
     - vni13
     - vni24
@@ -46,7 +36,7 @@ leaf1:
   vlan_id: 24
   local_ip: 10.0.0.11
  vlan13:
-  address: 10.1.3.11/24
+  address: 10.1.3.12/24
   vrr:
     ip: 10.1.3.1/24
     mac: "44:39:39:ff:00:13"
