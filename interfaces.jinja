@@ -30,7 +30,7 @@ iface eth0 inet dhcp
 # Port to Leaf02
 auto swp50
 iface swp50
-  alias {{ swp50.description }}
+  #alias {{ swp50.description }}
   # This is required for Vagrant only
   post-up ip link set swp50 promisc on
 
