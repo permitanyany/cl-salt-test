@@ -1,0 +1,10 @@
+---
+stages:
+  - deploy
+
+production:
+  tags:
+    - production
+  stage: deploy
+  script:
+    - "sudo salt '*' state.apply"
