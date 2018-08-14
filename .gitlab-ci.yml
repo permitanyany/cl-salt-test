@@ -10,7 +10,7 @@ deploy:
   script:
     - sudo salt '*' state.apply
 
-test:
+bgp_test:
   tags:
     - production
   stage: test
@@ -20,3 +20,12 @@ test:
     variables:
       - $CI_COMMIT_MESSAGE =~ /test-bgp/
 
+mlag_test:
+  tags:
+    - production
+  stage: test
+  script:
+    - sudo salt '*' cmd.run 'net show clag json' | grep '"peerAlive":"true"'
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /mlag/
