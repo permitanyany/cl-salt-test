@@ -1,10 +1,22 @@
 ---
 stages:
   - deploy
+  - test
 
-production:
+deploy:
   tags:
-    - production
+    - blabla
   stage: deploy
   script:
-    - "sudo salt '*' state.apply"
+    - sudo salt '*' state.apply
+
+test:
+  tags:
+    - blabla
+  stage: test
+  script:
+    - sudo salt '*' cmd.run 'net show bgp summary json' | grep '"state":"Idle"'
+  only:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /test-bgp/
+
