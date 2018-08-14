@@ -25,7 +25,7 @@ mlag_test:
     - production
   stage: test
   script:
-    - sudo salt '*' cmd.run 'net show clag json' | grep '"peerAlive": "true"'
+    - sudo salt '*' cmd.run 'net show clag json' | grep '"peerAlive":\s true'
   only:
     variables:
       - $CI_COMMIT_MESSAGE =~ /mlag/
