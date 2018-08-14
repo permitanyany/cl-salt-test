@@ -5,14 +5,14 @@ stages:
 
 deploy:
   tags:
-    - blabla
+    - production
   stage: deploy
   script:
     - sudo salt '*' state.apply
 
 test:
   tags:
-    - blabla
+    - production
   stage: test
   script:
     - sudo salt '*' cmd.run 'net show bgp summary json' | grep '"state":"Idle"'
