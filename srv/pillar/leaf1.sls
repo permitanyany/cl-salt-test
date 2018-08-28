@@ -3,7 +3,8 @@ leaf1:
   ip: 10.0.0.11/32
   clag_anycast: 10.0.0.112
  swp1: 
-  description: to Server01
+  description: THIS IS LEAF1
+  ip: 192.168.5.5/24
  swp2: 
   description: to Server02
  swp49:

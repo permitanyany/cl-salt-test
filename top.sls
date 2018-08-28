@@ -1,3 +1,3 @@
 base:
   '*':
-    - leaf1
+    - interface_file

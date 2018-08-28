@@ -13,19 +13,19 @@ iface vagrant inet dhcp
 
 auto swp1
 iface swp1
-    alias test2
-    address 192.168.5.5/24
+    alias {{ swp1.description }}
+    address {{ swp1.ip }}
 
 auto eth0
 iface eth0 inet dhcp
 
 
 # Port to Leaf02
-#auto swp49
-#iface swp49
-#  alias {{ swp49.description }}
-#  # This is required for Vagrant only
-#  post-up ip link set swp49 promisc on
+auto swp49
+iface swp49
+  alias {{ swp49.description }}
+  # This is required for Vagrant only
+  post-up ip link set swp49 promisc on
 
 # Port to Leaf02
 auto swp50
@@ -50,7 +50,7 @@ iface swp52
 auto peerlink
 iface peerlink
   mtu 9000
-  bond-slaves swp50
+  bond-slaves swp49 swp50
 
 # CLAG Peerlink L2 interface.
 # This creates VLAN 4094 that only lives on the peerlink bond
