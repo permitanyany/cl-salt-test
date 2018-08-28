@@ -1,0 +1,37 @@
+frr defaults datacenter
+  username cumulus nopassword
+  !
+  service integrated-vtysh-config
+  !
+  log syslog informational
+  !
+  vrf vrf1
+   vni 104001
+  !
+  {% for interface in bgp.neighbors -%}
+  interface {{ interface }}
+   ipv6 nd ra-interval 10
+   no ipv6 nd suppress-ra
+  {% endfor %}
+  !
+  router bgp {{ bgp.as }}
+   bgp router-id {{ vni13.local_ip }}
+   bgp bestpath as-path multipath-relax
+   {% for interface in bgp.neighbors -%}
+   neighbor {{ interface }} interface remote-as internal
+   {% endfor %}
+   !
+   address-family ipv4 unicast
+    network {{ loopback.ip }}
+    network {{ loopback.clag_anycast }}/32
+   exit-address-family
+   !
+   address-family l2vpn evpn
+    {% for interface in bgp.neighbors -%}
+    neighbor {{ interface }} activate
+    {% endfor %}
+    advertise-all-vni
+   exit-address-family
+  !
+  line vty
+  !
