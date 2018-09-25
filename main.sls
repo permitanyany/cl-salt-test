@@ -13,6 +13,13 @@
 'sudo ifreload -a':
   cmd.run
 
+/etc/frr/daemons:
+  file.managed:
+    - source: salt://daemons
+
 frr:
   service.running:
     - restart: True
+    - watch:
+      - file: /etc/frr/frr.conf
+      - file: /etc/frr/daemons

@@ -53,3 +53,4 @@ leaf1:
   neighbors:
     - swp51
     - swp52
+    - peerlink.4094

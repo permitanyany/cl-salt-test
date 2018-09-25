@@ -1,3 +1,3 @@
 base:
   '*':
-    - interface_file
+    - main
